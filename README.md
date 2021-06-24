@@ -1,1 +1,3 @@
-# cycling-gpx
+Эксперимент использования бесплатного github-хостинга для личного сайта о велопоездках по GPX-данным.
+
+Ссылка на сайт: https://horis-sfrolkin.github.io/cycling-gpx/
