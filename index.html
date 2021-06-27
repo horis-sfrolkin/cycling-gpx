@@ -5,52 +5,59 @@
     <title>Quick Start - Leaflet</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
-    <link rel="stylesheet" href="css/leaflet.css" />
+    <!-- <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" /> -->
+    <link rel="stylesheet" href="css/leaflet.css">
+    <link rel="stylesheet" href="css/cycling-gpx.css">
+    <script src="js/jquery-3.6.0.min.js"></script>
     <script src="js/leaflet.js"></script>
+    <script>var tracks = {}</script>
+    <script src="routes/1620740955.js"></script>
+    <script src="routes/1620828488.js"></script>
+    <script src="routes/1620915156.js"></script>
+    <script src="routes/1620916245.js"></script>
+    <script src="routes/1621000412.js"></script>
+    <script src="routes/1621073174.js"></script>
+    <script src="routes/1621172845.js"></script>
+    <script src="routes/1621259369.js"></script>
+    <script src="routes/1621345743.js"></script>
+    <script src="routes/1621415483.js"></script>
+    <script src="routes/1621503003.js"></script>
+    <script src="routes/1621588440.js"></script>
+    <script src="routes/1621701875.js"></script>
+    <script src="routes/1621706530.js"></script>
+    <script src="routes/1621863833.js"></script>
+    <script src="routes/1621942773.js"></script>
+    <script src="routes/1622106478.js"></script>
+    <script src="routes/1622209235.js"></script>
+    <script src="routes/1622383115.js"></script>
+    <script src="routes/1622384799.js"></script>
+    <script src="routes/1622460680.js"></script>
+    <script src="routes/1622553531.js"></script>
+    <script src="routes/1622634888.js"></script>
+    <script src="routes/1622636398.js"></script>
+    <script src="routes/1622728859.js"></script>
+    <script src="routes/1622813804.js"></script>
+    <script src="routes/1622898096.js"></script>
+    <script src="routes/1622980412.js"></script>
+    <script src="routes/1623074342.js"></script>
+    <script src="routes/1623159203.js"></script>
+    <script src="routes/1623239410.js"></script>
+    <script src="routes/1623334304.js"></script>
+    <script src="routes/1623419018.js"></script>
+    <script src="routes/1623498240.js"></script>
+    <script src="routes/1624116061.js"></script>
+    <script src="routes/1624170131.js"></script>
+    <script src="routes/1624287787.js"></script>
+    <script src="routes/1624371802.js"></script>
+    <script src="routes/1624471302.js"></script>
+    <script src="routes/1624632594.js"></script>
+    <script src="routes/1624717258.js"></script>
 </head>
 
 <body>
-    <div id="mapid" style="width: 600px; height: 400px;"></div>
-    <script>
-        var mymap = L.map('mapid').setView([51.505, -0.09], 13);
-
-        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-            maxZoom: 18,
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
-                'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-            id: 'mapbox/streets-v11',
-            tileSize: 512,
-            zoomOffset: -1
-        }).addTo(mymap);
-
-        L.marker([51.5, -0.09]).addTo(mymap)
-            .bindPopup("<b>Hello world!</b><br />I am a popup.").openPopup();
-
-        L.circle([51.508, -0.11], 500, {
-            color: 'red',
-            fillColor: '#f03',
-            fillOpacity: 0.5
-        }).addTo(mymap).bindPopup("I am a circle.");
-
-        L.polygon([
-            [51.509, -0.08],
-            [51.503, -0.06],
-            [51.51, -0.047]
-        ]).addTo(mymap).bindPopup("I am a polygon.");
-
-
-        var popup = L.popup();
-
-        function onMapClick(e) {
-            popup
-                .setLatLng(e.latlng)
-                .setContent("You clicked the map at " + e.latlng.toString())
-                .openOn(mymap);
-        }
-
-        mymap.on('click', onMapClick);
-    </script>
+    <div id="mapid"></div>
+    <select id="tracks"></select>
+    <script src="js/cycling-gpx.js"></script>
 </body>
 
 </html>
