@@ -21,6 +21,8 @@ type point struct {
 	Dist float64   //Расстояние от предыдущей точки
 }
 
+const maxSpeed = 20 //максимальная адекватная скорость в м/с
+
 // deg2rad преобразует значение угла из градусов в радианы
 func deg2rad(deg float64) float64 {
 	return deg * math.Pi / 180
@@ -60,6 +62,10 @@ func decodeGpxXml(r io.Reader) ([]point, error) {
 					if p.Dist <= 0 {
 						continue
 					}
+					dt := p.Time.Sub(prev.Time).Seconds()
+					if dt > 0 && p.Dist/dt > maxSpeed {
+						continue
+					}
 				}
 				points = append(points, p)
 				prev = &p
@@ -69,27 +75,28 @@ func decodeGpxXml(r io.Reader) ([]point, error) {
 	return points, nil
 }
 
-func outputVars(points []point, output string) error {
+func outputVars(points []point, output string) (string, error) {
 	if len(points) < 1 {
-		return errors.New("в треке нет данных")
+		return "", errors.New("в треке нет данных")
 	}
 	var w io.WriteCloser
 	var err error
+	var begTime = points[0].Time
+	var begTimeUnix = strconv.FormatInt(begTime.Unix(), 10)
 	if output == "" {
 		w = os.Stdout
 	} else {
 		var fi os.FileInfo
 		if fi, err = os.Stat(output); err == nil {
 			if fi.IsDir() {
-				t := points[0].Time
-				w, err = os.Create(path.Join(output, t.Format("20060102150405")+"_"+strconv.FormatInt(t.Unix(), 10)+".json"))
-			} else {
-				w, err = os.Create(output)
+				output = path.Join(output, begTimeUnix+".js")
 			}
 		}
-	}
-	if err != nil {
-		return err
+		w, err = os.Create(output)
+		if err != nil {
+			return "", err
+		}
+		defer w.Close()
 	}
 	outArray := func(prefix string, suffix string, outItem func(point)) {
 		fmt.Fprintf(w, "\"%s\":[", prefix)
@@ -102,7 +109,7 @@ func outputVars(points []point, output string) error {
 		fmt.Fprintf(w, "]%s", suffix)
 	}
 	// объект
-	fmt.Fprint(w, "{")
+	fmt.Fprintf(w, "tracks['%s']={", begTimeUnix)
 	// кординаты
 	outArray("ll", ",", func(p point) {
 		fmt.Fprintf(w, "[%f,%f]", p.Lat, p.Lon)
@@ -122,7 +129,7 @@ func outputVars(points []point, output string) error {
 		fmt.Fprintf(w, "%.2f", p.Dist)
 	})
 	fmt.Fprint(w, "}")
-	return nil
+	return output, nil
 }
 
 func parseArgs(args []string) (files []string, dest string, err error) {
@@ -161,8 +168,11 @@ func main() {
 		points, err := decodeGpxXml(f)
 		f.Close()
 		abortIfError(3, err)
-		err = outputVars(points, dest)
+		output, err := outputVars(points, dest)
 		abortIfError(4, err)
+		if output != "" {
+			fmt.Print(" -> " + output)
+		}
 		fmt.Println()
 	}
 }

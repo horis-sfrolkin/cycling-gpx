@@ -54,7 +54,7 @@ func Example_decodeGpxXml1() {
 	points, _ := decodeGpxXml(r)
 	outputVars(points, "")
 	// Output:
-	// {"ll":[[59.907581,30.256245],[59.907620,30.256319],[59.907591,30.256423]],"dt":[0,2,4],"dd":[0.00,5.99,6.64]}
+	// tracks['1622728859']={"ll":[[59.907581,30.256245],[59.907620,30.256319],[59.907591,30.256423]],"dt":[0,2,4],"dd":[0.00,5.99,6.64]}
 }
 
 func Example_decodeGpxXml2() {
@@ -78,6 +78,8 @@ func Example_main() {
 	os.Args = append([]string{os.Args[0]}, "-i=.test\\*.gpx", "-o=.test")
 	main()
 	// Output:
+	// .test\2_июня_2021 г.,_15_19.gpx -> .test/1622636398.js
+	// .test\3_июня_2021 г.,_17_00.gpx -> .test/1622728859.js
 }
 
 func Test_distance(t *testing.T) {
@@ -90,7 +92,6 @@ func Test_distance(t *testing.T) {
 	tst(77.1539, -139.398, -77.1804, -139.55, 17166029)
 	tst(77.1539, 120.398, 77.1804, 129.55, 225883)
 	tst(77.1539, -120.398, 77.1804, 129.55, 2332669)
-
 }
 
 func Example_parseArgs() {
