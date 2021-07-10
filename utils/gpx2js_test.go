@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -96,21 +97,106 @@ func Test_distance(t *testing.T) {
 
 func Example_parseArgs() {
 	tst := func(args []string) {
-		files, dest, err := parseArgs(args)
+		files, dest, html, err := parseArgs(args)
 		if err != nil {
 			fmt.Println(err.Error())
 		} else {
-			fmt.Println(files, dest)
+			fmt.Println(files)
+			fmt.Println(dest)
+			fmt.Println(html)
 		}
 	}
 	tst([]string{})
 	tst([]string{"-h"})
 	tst([]string{"-i=.test/2_июня_2021 г.,_15_19.gpx", "-o=.test"})
+	tst([]string{"-i=.test/2_июня_2021 г.,_15_19.gpx", "-o=.test", "-s=.test\\index.html"})
 	tst([]string{"-i=.test\\*.gpx"})
+	tst([]string{"-i=.test/2_июня_2021 г.,_15_19.gpx", "-o=.test\\xxx"})
+	tst([]string{"-i=.test/2_июня_2021 г.,_15_19.gpx", "-o=.test\\1622636398.js"})
 
 	// Output:
 	// не указан входной файл
 	// flag: help requested
-	// [.test/2_июня_2021 г.,_15_19.gpx] .test
-	// [.test\2_июня_2021 г.,_15_19.gpx .test\3_июня_2021 г.,_17_00.gpx] .
+	// [.test/2_июня_2021 г.,_15_19.gpx]
+	// .test
+
+	// [.test/2_июня_2021 г.,_15_19.gpx]
+	// .test
+	// .test\index.html
+	// [.test\2_июня_2021 г.,_15_19.gpx .test\3_июня_2021 г.,_17_00.gpx]
+	// .
+
+	// выходной каталог '.test\xxx' не является каталогом
+	// выходной каталог '.test\1622636398.js' не является каталогом
+}
+
+func Example_readHtml() {
+	prevLines, postLines, err := readHtml(".test\\index.html")
+	if err != nil {
+		return
+	}
+	for _, line := range prevLines {
+		fmt.Println(line)
+	}
+	for _, line := range postLines {
+		fmt.Println(line)
+	}
+
+	// Output:
+	// <!DOCTYPE html>
+	// <html>
+	// <head>
+	//     <title>Велопоездки</title>
+	//     <meta charset="utf-8" />
+	//     <link rel="stylesheet" href="css/leaflet.css">
+	//     <link rel="stylesheet" href="css/cycling-gpx.css">
+	//     <script src="js/jquery-3.6.0.min.js"></script>
+	//     <script src="js/leaflet.js"></script>
+	//     <script>var tracks = {}</script>
+	//     <!-- begin of routers -->
+	//     <!-- end of routers -->
+	// </head>
+	// <body>
+	//     <div id="mapid"></div>
+	//     <select id="tracks"></select>
+	//     <script src="js/cycling-gpx.js"></script>
+	// </body>
+	// </html>
+}
+
+func Example_writeHtml() {
+	html := ".test\\index.html"
+	dest := ".test"
+	prevLines, postLines, err := readHtml(html)
+	if err != nil {
+		return
+	}
+	w := os.Stdout
+	err = writeHtml(w, filepath.Dir(html), dest, prevLines, postLines)
+	if err != nil {
+		return
+	}
+
+	// Output:
+	// <!DOCTYPE html>
+	// <html>
+	// <head>
+	//     <title>Велопоездки</title>
+	//     <meta charset="utf-8" />
+	//     <link rel="stylesheet" href="css/leaflet.css">
+	//     <link rel="stylesheet" href="css/cycling-gpx.css">
+	//     <script src="js/jquery-3.6.0.min.js"></script>
+	//     <script src="js/leaflet.js"></script>
+	//     <script>var tracks = {}</script>
+	//     <!-- begin of routers -->
+	//     <script src="1622636398.js"></script>
+	//     <script src="1622728859.js"></script>
+	//     <!-- end of routers -->
+	// </head>
+	// <body>
+	//     <div id="mapid"></div>
+	//     <select id="tracks"></select>
+	//     <script src="js/cycling-gpx.js"></script>
+	// </body>
+	// </html>
 }
