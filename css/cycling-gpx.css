@@ -14,3 +14,16 @@ select#tracks {
     width: 17em;
     font-size: 14pt;
 }
+.leaflet-pane .leaflet-div-icon {
+    background: none;
+    border: none;
+}
+.leaflet-pane .leaflet-div-icon div {
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    border-radius: 4px;
+    background-color: rgba(0, 0, 255, 0.6);
+    color: white;
+    font-weight: bold;
+    padding: 0 4px;
+    text-align: center;
+}
