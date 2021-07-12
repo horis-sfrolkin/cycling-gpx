@@ -1,12 +1,19 @@
 (function () {
     const trackStyle = { color: '#e600aa', weight: 4 }
-    const distSpeedRange = 333
+    const distSpeedRange = 1000
 
     let map = L.map('mapid')
     let trackLayer
     let velocityLayer
 
     Number.prototype.NN = function () { return (this < 10 ? '0' : '') + this }
+
+    Number.prototype.time = function () {
+        let s = this % 60
+        let m = Math.floor(this / 60) % 60
+        let h = Math.floor(this / 3600)
+        return h.NN() + ':' + m.NN() + ':' + s.NN()
+    }
 
     Date.prototype.date = function () {//в формат YYYY-MM-DD
         return this.getFullYear() + '-' + (this.getMonth() + 1).NN() + '-' + this.getDate().NN()
@@ -104,9 +111,9 @@
             if (dist > distSpeedRange) {
                 dist = 0
                 if (maxSpeedIndex > 0) {
-                    title = `${maxSpeedIndex}\n`
-                        + `${(new Date(markerTime * 1000)).time()}\n`
-                        + `${(markerDist * 0.001).toFixed(1)} км`
+                    title = `${(new Date(markerTime * 1000)).time()}`
+                        + ` (${(markerTime - timestamp).time()})`
+                        + `\n${(markerDist * 0.001).toFixed(1)} км`
                     L.marker(
                         track.ll[maxSpeedIndex],
                         {
