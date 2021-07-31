@@ -1,18 +1,22 @@
 (function () {
     const trackStyle = { color: '#e600aa', weight: 4 }
-    const distSpeedRange = 1000
 
+    /** объекты карты */
     let map = L.map('mapid')
+    /** Слой трека */
     let trackLayer
+    /** Слой скоростей */
     let velocityLayer
+    /** timestamp трека, который сейчас на карте*/
+    let trackTime = 0
 
     Number.prototype.NN = function () { return (this < 10 ? '0' : '') + this }
 
-    Number.prototype.time = function () {
+    Number.prototype.time = function () {//в формат (?hh:)mm:ss
         let s = this % 60
         let m = Math.floor(this / 60) % 60
         let h = Math.floor(this / 3600)
-        return h.NN() + ':' + m.NN() + ':' + s.NN()
+        return (h < 1 ? '' : (h.NN() + ':')) + m.NN() + ':' + s.NN()
     }
 
     Date.prototype.date = function () {//в формат YYYY-MM-DD
@@ -42,7 +46,8 @@
             id: 'mapbox/streets-v11',
             tileSize: 512,
             zoomOffset: -1
-        }).addTo(map);
+        }).addTo(map)
+        map.on("zoomend", onZoomEnd)
     }
 
     function addTrack(track) {
@@ -85,47 +90,35 @@
             velocityLayer.remove()
         }
         velocityLayer = L.layerGroup()
+        let distSpeedRange = 250 * Math.pow(2, (14 - map.getZoom()))
         let time = Number(timestamp)
         let dist = 0
         let totalDist = 0
-        let markerDist = 0
-        let markerTime = 0
-        let maxSpeedIndex = 0
-        let maxSpeed = 0
         let speedFilter = new SpeedFilter()
         for (const i in track.dd) {
             dist += track.dd[i]
             totalDist += track.dd[i]
-            if (track.dt[i] > 0) {
-                time += track.dt[i]
-                let speed = track.dd[i] / track.dt[i] * 3.6 // скорость в точке трека в км/ч
-                if (speedFilter.validate(time, speed)) {
-                    if (speed > maxSpeed) {
-                        maxSpeedIndex = i
-                        maxSpeed = speed
-                        markerDist = totalDist
-                        markerTime = time
-                    }
-                }
+            if (track.dt[i] <= 0) {
+                continue;
             }
-            if (dist > distSpeedRange) {
+            time += track.dt[i]
+            let speed = track.dd[i] / track.dt[i] * 3.6 // скорость в точке трека в км/ч
+            if (speedFilter.validate(time, speed)) {
+                continue;
+            }
+            if (dist >= distSpeedRange) {
                 dist = 0
-                if (maxSpeedIndex > 0) {
-                    title = `${(new Date(markerTime * 1000)).time()}`
-                        + ` (${(markerTime - timestamp).time()})`
-                        + `\n${(markerDist * 0.001).toFixed(1)} км`
-                    L.marker(
-                        track.ll[maxSpeedIndex],
-                        {
-                            icon: L.divIcon({
-                                html: `<div title="${title}">${maxSpeed.toFixed(0)}</div>`,
-                                iconSize: [30, 30]
-                            })
-                        }
-                    ).addTo(velocityLayer)
-                }
-                maxSpeedIndex = 0
-                maxSpeed = 0
+                title = `${new Date(time * 1000).time()} (${(time - timestamp).time()})`
+                    + `\n${(totalDist * 0.001).toFixed(1)} км`
+                L.marker(
+                    track.ll[i],
+                    {
+                        icon: L.divIcon({
+                            html: `<div title="${title}">${speed.toFixed(0)}</div>`,
+                            iconSize: [30, 30]
+                        })
+                    }
+                ).addTo(velocityLayer)
             }
         }
         velocityLayer.addTo(map)
@@ -143,18 +136,22 @@
         }
         var hp = new URLSearchParams(location.hash.substr(1));
         if (hp.has('ts')) {// если параметра есть, то выделяем его, иначе выделяем последний
-            $option = $select.find('option[value="'+hp.get('ts')+'"]')
-        } else {
+            trackTime = Number(hp.get('ts'))
+            $option = $select.find(`option[value="${trackTime}"]`)
         }
         $option.prop('selected', true)
         $select.change(function () {
-            let timestamp = $(this).val()
-            let track = tracks[timestamp]
+            trackTime = Number($(this).val())
+            let track = tracks[trackTime]
             addTrack(track)
-            addVelocities(timestamp, track)
-            location.hash = '#ts=' + timestamp
+            // addVelocities(trackTime, track)
+            location.hash = `#ts=${trackTime}`
         })
         $select.trigger('change')
+    }
+
+    function onZoomEnd(ev) {
+        addVelocities(trackTime, tracks[trackTime])
     }
 
     initMap();
