@@ -9,6 +9,9 @@
     let velocityLayer
     /** timestamp трека, который сейчас на карте*/
     let trackTime = 0
+    /** данные построения последнего слоя скоростей, чтобы не строить его дважды */
+    let velocityLayerTime = 0
+    let velocityLayerZoom = 0
 
     Number.prototype.NN = function () { return (this < 10 ? '0' : '') + this }
 
@@ -85,16 +88,22 @@
         }
     }
 
-    function addVelocities(timestamp, track) {
+    function addVelocities(timestamp, zoom) {
         if (!!velocityLayer) {
+            if (velocityLayerTime == timestamp && velocityLayerZoom == zoom) {
+                return // этото слой скоростей уже построен - пропускаем
+            }
             velocityLayer.remove()
         }
+        velocityLayerTime = timestamp
+        velocityLayerZoom = zoom
         velocityLayer = L.layerGroup()
-        let distSpeedRange = 250 * Math.pow(2, (14 - map.getZoom()))
+        let distSpeedRange = 250 * Math.pow(2, (14 - zoom))
         let time = Number(timestamp)
         let dist = 0
         let totalDist = 0
         let speedFilter = new SpeedFilter()
+        let track = tracks[timestamp]
         for (const i in track.dd) {
             dist += track.dd[i]
             totalDist += track.dd[i]
@@ -144,14 +153,14 @@
             trackTime = Number($(this).val())
             let track = tracks[trackTime]
             addTrack(track)
-            // addVelocities(trackTime, track)
+            addVelocities(trackTime, map.getZoom())
             location.hash = `#ts=${trackTime}`
         })
         $select.trigger('change')
     }
 
     function onZoomEnd(ev) {
-        addVelocities(trackTime, tracks[trackTime])
+        addVelocities(trackTime, map.getZoom())
     }
 
     initMap();
