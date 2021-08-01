@@ -112,7 +112,7 @@
             }
             time += track.dt[i]
             let speed = track.dd[i] / track.dt[i] * 3.6 // скорость в точке трека в км/ч
-            if (speedFilter.validate(time, speed)) {
+            if (!speedFilter.validate(time, speed)) {
                 continue;
             }
             if (dist >= distSpeedRange) {
