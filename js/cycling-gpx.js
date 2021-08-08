@@ -1,5 +1,8 @@
 (function () {
-    const trackStyle = { color: '#e600aa', weight: 4 }
+    const TRACK_STYLE = { color: '#e600aa', weight: 4 } // оформление трека
+    const MIN_SPEED = 8 / 3.6 //минимальная скорость для учета активности м/с
+    const MAX_SPPED = 45 / 3.6 //минимальная скорость для учета активности м/с
+    const MAX_ACCELERATION = 2 / 3.6 //максимальное ускорение м/с
 
     /** объекты карты */
     let map = L.map('mapid')
@@ -26,12 +29,14 @@
         return this.getFullYear() + '-' + (this.getMonth() + 1).NN() + '-' + this.getDate().NN()
     }
 
-    Date.prototype.time = function () {//в формат hh:mm:ss
-        return this.getHours().NN() + ':' + this.getMinutes().NN() + ':' + this.getSeconds().NN()
+    Date.prototype.time = function (onlyMinutes) {//в формат hh:mm:ss
+        return this.getHours().NN()
+            + ':' + this.getMinutes().NN()
+            + (onlyMinutes ? '' : (':' + this.getSeconds().NN()))
     }
 
     Date.prototype.datetime = function () {//в формат YYYY-MM-DD hh:mm:ss
-        return this.date() + ' ' + this.time()
+        return this.date() + ' ' + this.time(true)
     }
 
     function trackDist(track) {
@@ -44,7 +49,7 @@
 
     function initMap() {
         L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-            maxZoom: 18,
+            maxZoom: 20,
             attribution: '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap</a>',
             id: 'mapbox/streets-v11',
             tileSize: 512,
@@ -57,22 +62,17 @@
         if (!!trackLayer) {
             trackLayer.remove()
         }
-        trackLayer = L.polyline(track.ll, trackStyle)
+        trackLayer = L.polyline(track.ll, TRACK_STYLE)
         trackLayer.addTo(map)
         map.fitBounds(trackLayer.getBounds())
     }
 
     class SpeedFilter {
         constructor() {
-            this.minSpeed = 10 //км/ч
-            this.maxSpeed = 45 //км/ч
-            this.maxAcceleration = 2 //км/ч/с
-
             this.prevTime = 0
             this.prevSpeed = 0
         }
         validate(time, speed) {
-            // return true
             let acceleration = 0
             if (this.prevTime > 0) {
                 let dt = time - this.prevTime
@@ -80,11 +80,11 @@
                     acceleration = (speed - this.prevSpeed) / dt
                 }
             }
-            if (acceleration < this.maxAcceleration && speed < this.maxSpeed) {
+            if (acceleration < MAX_ACCELERATION && speed < MAX_SPPED) {
                 this.prevTime = time
                 this.prevSpeed = speed
             }
-            return acceleration < this.maxAcceleration && speed > this.minSpeed && speed < this.maxSpeed
+            return acceleration < MAX_ACCELERATION && speed > MIN_SPEED && speed < MAX_SPPED
         }
     }
 
@@ -111,7 +111,7 @@
                 continue;
             }
             time += track.dt[i]
-            let speed = track.dd[i] / track.dt[i] * 3.6 // скорость в точке трека в км/ч
+            let speed = track.dd[i] / track.dt[i]
             if (!speedFilter.validate(time, speed)) {
                 continue;
             }
@@ -123,7 +123,7 @@
                     track.ll[i],
                     {
                         icon: L.divIcon({
-                            html: `<div title="${title}">${speed.toFixed(0)}</div>`,
+                            html: `<div title="${title}">${(3.6 * speed).toFixed(0)}</div>`,
                             iconSize: [30, 30]
                         })
                     }
@@ -133,13 +133,35 @@
         velocityLayer.addTo(map)
     }
 
+    function trackAverageSpeed(track) {
+        let activeDist = 0
+        let activeTime = 0
+        let time = 0
+        let speedFilter = new SpeedFilter()
+        for (const i in track.dd) {
+            if (track.dt[i] <= 0) {
+                continue;
+            }
+            time += track.dt[i]
+            let speed = track.dd[i] / track.dt[i]
+            if (speedFilter.validate(time, speed)) {
+                activeDist += track.dd[i]
+                activeTime += track.dt[i]
+            }
+        }
+        return activeTime > 0 ? (3.6 * activeDist / activeTime) : 0
+    }
+
     function initSelector() {
         let $select = $('select#tracks')
         let $option
         for (const ts in tracks) {
             let track = tracks[ts]
             let dist = trackDist(track) * 0.001
-            let caption = `${(new Date(Number(ts) * 1000)).datetime()}&nbsp;&nbsp;&nbsp;${dist.toFixed(1)} км`
+            let speed = trackAverageSpeed(track)
+            let caption = `${(new Date(Number(ts) * 1000)).datetime()}`
+                + `&nbsp;&nbsp;&nbsp;${speed.toFixed(1)} км/ч`
+                + `&nbsp;&nbsp;&nbsp;${dist.toFixed(1)} км`
             $option = $(`<option value='${ts}'>${caption}</option>`)
             $select.append($option)
         }

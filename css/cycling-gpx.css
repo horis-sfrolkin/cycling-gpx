@@ -11,7 +11,7 @@ select#tracks {
     right: 1ex;
     top: 1ex;
     z-index: 1000;
-    width: 17em;
+    width: 19em;
     font-size: 14pt;
 }
 .leaflet-pane .leaflet-div-icon {
