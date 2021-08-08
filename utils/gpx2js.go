@@ -85,9 +85,9 @@ func decodeGpxXml(r io.Reader) ([]point, error) {
 	}
 	lastPointIndex := len(points) - 1
 	// без сглаживания скоростей
-	for i := 1; i <= lastPointIndex; i++ {
-		points[i].Dist = distance(points[i-1].Lat, points[i-1].Lon, points[i].Lat, points[i].Lon)
-	}
+	// for i := 1; i <= lastPointIndex; i++ {
+	// 	points[i].Dist = distance(points[i-1].Lat, points[i-1].Lon, points[i].Lat, points[i].Lon)
+	// }
 	// // сглаживание скоростей по отдаленным точкам
 	for i := 1; i <= lastPointIndex; i++ {
 		l := i - smoothCount
