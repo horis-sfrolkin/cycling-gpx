@@ -58,23 +58,6 @@ func Example_decodeGpxXml1() {
 	// tracks['1622728859']={"ll":[[59.907581,30.256245],[59.907620,30.256319],[59.907591,30.256423]],"dt":[0,2,4],"dd":[0.00,5.99,6.64]}
 }
 
-func Example_decodeGpxXml2() {
-	r, err := os.Open(".test/2_июня_2021 г.,_15_19.gpx")
-	if err != nil {
-		fmt.Println(err.Error())
-	} else {
-		points, err := decodeGpxXml(r)
-		if err != nil {
-			fmt.Println(err.Error())
-		} else {
-			outputVars(points, ".test")
-			fmt.Println(len(points))
-		}
-	}
-	// Output:
-	// 1244
-}
-
 func Example_decodeGpxXml3() {
 	r, err := os.Open(".test/3_июня_2021 г.,_17_00.gpx")
 	if err != nil {
@@ -126,6 +109,23 @@ func Example_decodeGpxXml3() {
 	// 00:00:29  5.03
 	// 00:00:30  4.41
 	// 00:01:31  4.09
+}
+
+func Example_decodeGpxXml4() {
+	r, err := os.Open("/Users/sfrolkin/Downloads/19_04_2022_11_58.gpx")
+	if err != nil {
+		fmt.Println(err.Error())
+	} else {
+		points, err := decodeGpxXml(r)
+		if err != nil {
+			fmt.Println(err.Error())
+		} else {
+			outputVars(points, ".test")
+			fmt.Println(len(points))
+		}
+	}
+	// Output:
+	// 1244
 }
 
 func Example_main() {
