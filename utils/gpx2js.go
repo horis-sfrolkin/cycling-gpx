@@ -23,9 +23,9 @@ type point struct {
 	Dist float64   //Расстояние от предыдущей точки в метрах
 }
 
-const maxSpeed = 40   //максимальная адекватная скорость в м/с
-const smoothCount = 3 //количество соседних точек назад и вперед для сглаживания
-const smoothTime = 3  //интервал в секундах назад и вперед для сглаживания
+const maxSpeed = 20   //максимальная адекватная скорость в м/с
+const smoothCount = 5 //количество соседних точек назад и вперед для сглаживания
+const smoothTime = 5  //интервал в секундах назад и вперед для сглаживания
 
 // deg2rad преобразует значение угла из градусов в радианы
 func deg2rad(deg float64) float64 {
@@ -85,30 +85,30 @@ func decodeGpxXml(r io.Reader) ([]point, error) {
 	}
 	lastPointIndex := len(points) - 1
 	// без сглаживания скоростей
-	for i := 1; i <= lastPointIndex; i++ {
-		points[i].Dist = distance(points[i-1].Lat, points[i-1].Lon, points[i].Lat, points[i].Lon)
-	}
-	// сглаживание скоростей по отдаленным точкам
 	// for i := 1; i <= lastPointIndex; i++ {
-	// 	l := i - smoothCount
-	// 	if l < 0 {
-	// 		l = 0
-	// 	}
-	// 	minTime := points[i].Time.Add(-time.Second * smoothTime)
-	// 	for l < (i-1) && points[l].Time.Before(minTime) {
-	// 		l++
-	// 	}
-	// 	maxTime := points[i].Time.Add(time.Second * smoothTime)
-	// 	m := i + smoothCount
-	// 	if m > lastPointIndex {
-	// 		m = lastPointIndex
-	// 	}
-	// 	for m > i && points[m].Time.After(maxTime) {
-	// 		m--
-	// 	}
-	// 	dist := distance(points[l].Lat, points[l].Lon, points[m].Lat, points[m].Lon)
-	// 	points[i].Dist = dist / float64(m-l)
+	// 	points[i].Dist = distance(points[i-1].Lat, points[i-1].Lon, points[i].Lat, points[i].Lon)
 	// }
+	// // сглаживание скоростей по отдаленным точкам
+	for i := 1; i <= lastPointIndex; i++ {
+		l := i - smoothCount
+		if l < 0 {
+			l = 0
+		}
+		minTime := points[i].Time.Add(-time.Second * smoothTime)
+		for l < (i-1) && points[l].Time.Before(minTime) {
+			l++
+		}
+		maxTime := points[i].Time.Add(time.Second * smoothTime)
+		m := i + smoothCount
+		if m > lastPointIndex {
+			m = lastPointIndex
+		}
+		for m > i && points[m].Time.After(maxTime) {
+			m--
+		}
+		dist := distance(points[l].Lat, points[l].Lon, points[m].Lat, points[m].Lon)
+		points[i].Dist = dist / float64(m-l)
+	}
 	return points, nil
 }
 
