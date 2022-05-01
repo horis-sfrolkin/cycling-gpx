@@ -1,8 +1,8 @@
 (function () {
     const TRACK_STYLE = { color: '#e600aa', weight: 4 } // оформление трека
     const MIN_SPEED = 8 / 3.6 //минимальная скорость для учета активности м/с
-    const MAX_SPPED = 45 / 3.6 //минимальная скорость для учета активности м/с
-    const MAX_ACCELERATION = 2 / 3.6 //максимальное ускорение м/с
+    const MAX_SPPED = 72 / 3.6 //минимальная скорость для учета активности м/с
+    const MAX_ACCELERATION = 4 / 3.6 //максимальное ускорение м/с
 
     /** объекты карты */
     let map = L.map('mapid')

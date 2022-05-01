@@ -23,9 +23,9 @@ type point struct {
 	Dist float64   //Расстояние от предыдущей точки в метрах
 }
 
-const maxSpeed = 20   //максимальная адекватная скорость в м/с
-const smoothCount = 5 //количество соседних точек назад и вперед для сглаживания
-const smoothTime = 5  //интервал в секундах назад и вперед для сглаживания
+const maxSpeed = 40   //максимальная адекватная скорость в м/с
+const smoothCount = 3 //количество соседних точек назад и вперед для сглаживания
+const smoothTime = 3  //интервал в секундах назад и вперед для сглаживания
 
 // deg2rad преобразует значение угла из градусов в радианы
 func deg2rad(deg float64) float64 {
@@ -69,9 +69,9 @@ func decodeGpxXml(r io.Reader) ([]point, error) {
 						if dist <= 0 {
 							continue
 						}
-						// if dist/dt > maxSpeed {
-						// 	continue
-						// }
+						if dist/dt > maxSpeed {
+							continue
+						}
 					} else if dt == 0 { // время новой точки не изменилось - удаляем предыдущую, чтобы заменить ее
 						points = points[:len(points)-1]
 					} else { // время новой точки меньше предыдущей - игнорируем
