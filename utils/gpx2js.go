@@ -69,9 +69,9 @@ func decodeGpxXml(r io.Reader) ([]point, error) {
 						if dist <= 0 {
 							continue
 						}
-						if dt > 0 && dist/dt > maxSpeed {
-							continue
-						}
+						// if dist/dt > maxSpeed {
+						// 	continue
+						// }
 					} else if dt == 0 { // время новой точки не изменилось - удаляем предыдущую, чтобы заменить ее
 						points = points[:len(points)-1]
 					} else { // время новой точки меньше предыдущей - игнорируем
