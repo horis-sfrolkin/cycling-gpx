@@ -1,0 +1,14 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Загрузить GPX-треки из /Users/sfrolkin/Downloads",
+            "type": "shell",
+            "command": "/usr/local/go/bin/go run utils/gpx2js.go -i=/Users/sfrolkin/Downloads/*.gpx -o=./routes/ -s=./index.html",
+            "group": "build",
+            "problemMatcher": []
+        },
+    ]
+}
