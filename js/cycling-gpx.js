@@ -1,7 +1,7 @@
 (function () {
     const TRACK_STYLE = { color: '#e600aa', weight: 4 } // оформление трека
     const MIN_SPEED = 8 / 3.6 //минимальная скорость для учета активности м/с
-    const MAX_SPPED = 72 / 3.6 //минимальная скорость для учета активности м/с
+    const MAX_SPPED = 72 / 3.6 //максимальная скорость для учета активности м/с
     const MAX_ACCELERATION = 4 / 3.6 //максимальное ускорение м/с
 
     /** объекты карты */
@@ -160,7 +160,7 @@
             let dist = trackDist(track) * 0.001
             let speed = trackAverageSpeed(track)
             let caption = `${(new Date(Number(ts) * 1000)).datetime()}`
-                + `&nbsp;&nbsp;&nbsp;${speed.toFixed(1)} км/ч`
+                + `&nbsp;&nbsp;&nbsp;${speed.toFixed(2)} км/ч`
                 + `&nbsp;&nbsp;&nbsp;${dist.toFixed(1)} км`
             $option = $(`<option value='${ts}'>${caption}</option>`)
             $select.append($option)
