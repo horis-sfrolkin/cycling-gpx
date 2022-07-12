@@ -7,7 +7,8 @@
             "label": "Загрузить GPX-треки из /Users/sfrolkin/Downloads",
             "type": "shell",
             // "command": "/usr/local/go/bin/go run utils/gpx2js.go -i=/Users/sfrolkin/Downloads/*.gpx -o=./routes/ -s=./index.html",
-            "command": "go run utils/gpx2js.go -i=C:\\Users\\nzmachinskaya\\Downloads\\*.gpx -o=./routes/ -s=./index.html",
+            // "command": "go run utils/gpx2js.go -i=C:\\Users\\nzmachinskaya\\Downloads\\*.gpx -o=./routes/ -s=./index.html",
+            "command": "utils\\gpx2js -i=C:\\Users\\nzmachinskaya\\Downloads\\*.gpx -o=./routes/ -s=./index.html",
             "group": "build",
             "problemMatcher": []
         },
