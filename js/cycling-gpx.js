@@ -48,13 +48,11 @@
     }
 
     function initMap() {
-        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-            maxZoom: 20,
-            attribution: '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap</a>',
-            id: 'mapbox/streets-v11',
-            tileSize: 512,
-            zoomOffset: -1
-        }).addTo(map)
+        const url = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+        const options = {
+            attribution: '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap</a>'
+        }
+        L.tileLayer(url, options).addTo(map)
         map.on("zoomend", onZoomEnd)
     }
 
