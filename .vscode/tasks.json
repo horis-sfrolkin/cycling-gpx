@@ -15,7 +15,7 @@
             "type": "shell",
             "command" : "google-chrome ${workspaceFolder}/index.html",
             "windows": {
-                "command" : "chrome ${workspaceFolder}/index.html"
+                "command" : "chrome.exe ${workspaceFolder}\\index.html"
             },
             "group": "build",
             "problemMatcher": []
