@@ -10,5 +10,15 @@
             "group": "build",
             "problemMatcher": []
         },
+        {
+            "label": "Открыть браузер с картой поездок",
+            "type": "shell",
+            "command" : "google-chrome ${workspaceFolder}/index.html",
+            "windows": {
+                "command" : "chrome ${workspaceFolder}/index.html"
+            },
+            "group": "build",
+            "problemMatcher": []
+        },
     ]
 }
