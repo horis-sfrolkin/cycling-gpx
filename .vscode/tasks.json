@@ -4,19 +4,9 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Загрузить GPX-треки из /Users/sfrolkin/Downloads",
+            "label": "Загрузить GPX-треки из /Users/sfrolkin/Downloads и открыть браузер с картой поездок",
             "type": "shell",
-            "command": "utils/gpx2js -i=/home/gres/Downloads/*.gpx -o=./routes/ -s=./index.html",
-            "group": "build",
-            "problemMatcher": []
-        },
-        {
-            "label": "Открыть браузер с картой поездок",
-            "type": "shell",
-            "command" : "google-chrome ${workspaceFolder}/index.html",
-            "windows": {
-                "command" : "chrome.exe ${workspaceFolder}\\index.html"
-            },
+            "command": "utils/gpx2js -i=/home/gres/Downloads/*.gpx -o=./routes/ -s=./index.html && google-chrome ${workspaceFolder}/index.html",
             "group": "build",
             "problemMatcher": []
         },
