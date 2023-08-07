@@ -152,17 +152,28 @@
 
     function initSelector() {
         let $select = $('select#tracks')
-        let $option
+        let $option, year, prevYear, yearDist = 0
         for (const ts in tracks) {
             let track = tracks[ts]
             let dist = trackDist(track) * 0.001
             let speed = trackAverageSpeed(track)
-            let caption = `${(new Date(Number(ts) * 1000)).datetime()}`
-                + `&nbsp;&nbsp;&nbsp;${speed.toFixed(2)} км/ч`
-                + `&nbsp;&nbsp;&nbsp;${dist.toFixed(1)} км`
+            let dt = new Date(Number(ts) * 1000)
+            year = dt.getFullYear()
+            let caption = `${dt.datetime()}`
+                + `&nbsp;&nbsp;&nbsp;${speed.toFixed(2)}&thinsp;км/ч`
+                + `&nbsp;&nbsp;&nbsp;${dist.toFixed(1)}&thinsp;км`
             $option = $(`<option value='${ts}'>${caption}</option>`)
             $select.append($option)
+            if (prevYear !== undefined && prevYear != year) {
+                let $prevOption = $option.prev()
+                $prevOption.html($prevOption.html() + `&nbsp;&nbsp;&nbsp;${yearDist.toFixed(1)}&thinsp;км за ${prevYear} год`)
+                yearDist = dist
+            } else {
+                yearDist += dist
+            }
+            prevYear = year
         }
+        $option.html($option.html() + `&nbsp;&nbsp;&nbsp;${yearDist.toFixed(1)}&thinsp;км за ${prevYear} год`)
         var hp = new URLSearchParams(location.hash.substr(1));
         if (hp.has('ts')) {// если параметра есть, то выделяем его, иначе выделяем последний
             trackTime = Number(hp.get('ts'))
